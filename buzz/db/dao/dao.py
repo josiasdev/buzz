@@ -19,8 +19,9 @@ class DAO(ABC, Generic[T]):
 
     def insert(self, record: T):
         query = self._create_query()
+        data = record.to_dict()
         fields = [
-            field for field in record.__dict__.keys() if field not in self.ignore_fields
+            field for field in data.keys() if field not in self.ignore_fields
         ]
         query.prepare(
             f"""
@@ -29,7 +30,7 @@ class DAO(ABC, Generic[T]):
         """
         )
         for field in fields:
-            query.bindValue(f":{field}", getattr(record, field))
+            query.bindValue(f":{field}", data[field])
 
         if not query.exec():
             raise Exception(query.lastError().text())

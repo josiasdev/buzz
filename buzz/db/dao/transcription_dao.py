@@ -113,8 +113,8 @@ class TranscriptionDAO(DAO[Transcription]):
         if not query.next():
             raise Exception("Transcription not found")
 
-        transcription_data = {field.name: query.value(field.name) for field in
-                              self.entity.__dataclass_fields__.values()}
+        record = query.record()
+        transcription_data = {record.fieldName(i): record.value(i) for i in range(record.count())}
 
         new_id = uuid.uuid4()
         transcription_data["id"] = str(new_id)
